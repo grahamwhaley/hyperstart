@@ -1049,6 +1049,8 @@ static int hyper_setup_interface(struct rtnl_handle *rth,
 					iface->device);
 			return -1;
 		}
+		free(iface->device);
+		iface->device = strdup(iface->new_device_name);
 	}
 
 	if (iface->mtu > 0) {
