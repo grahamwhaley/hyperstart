@@ -1044,7 +1044,11 @@ static int hyper_setup_interface(struct rtnl_handle *rth,
 
 	if (iface->new_device_name && strcmp(iface->new_device_name, iface->device)) {
 		fprintf(stdout, "Setting interface name to %s\n", iface->new_device_name);
-		hyper_set_interface_name(rth, ifindex, iface->new_device_name);
+		if (hyper_set_interface_name(rth, ifindex, iface->new_device_name) < 0) {
+			fprintf(stderr, "Set interface name failed for interface %s\n",
+					iface->device);
+			return -1;
+		}
 	}
 
 	if (iface->mtu > 0) {
