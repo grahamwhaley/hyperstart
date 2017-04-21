@@ -246,9 +246,8 @@ static int wait_for_nic(const char *nic_name)
 	struct uevent ue = {0};
 
 	if (! (nic_name && nic_name[0])) {
-		return -1;
+		return 0;
 	}
-
 
 	sprintf(path, "/sys/class/net/%s/ifindex", nic_name);
 
@@ -991,6 +990,18 @@ static int hyper_setup_interface(struct rtnl_handle *rth,
 	req.n.nlmsg_type = RTM_NEWADDR;
 	req.ifa.ifa_family = AF_INET;
 
+	/* Check and wait for the interface to appear in /sys first if the 
+	 * predictable name is provided. A process like systemd-udevd may be
+	 * in the middle of changing the interface name to the provided
+	 * predictable name.
+	 * This needs to happen before any operations on the interface to
+	 * reliably depend on its name.
+	 */
+	if (wait_for_nic(iface->device) < 0) {
+		fprintf(stderr, "failed to wait for  %s\n", iface->device);
+		return -1;
+	}
+
 	if (iface->device && iface->mac_addr &&
 	    hyper_check_device_match_mac_addr(iface->mac_addr,
 					      iface->device)) {
@@ -1005,10 +1016,6 @@ static int hyper_setup_interface(struct rtnl_handle *rth,
 		return -1;
 	}
 
-	if (wait_for_nic(iface->device) < 0){
-		fprintf(stderr, "failed to wait for  %s\n", iface->device);
-		return -1;
-	}
 	ifindex = hyper_get_ifindex(iface->device);
 	if (ifindex < 0) {
 		fprintf(stderr, "failed to get the ifindix of %s\n", iface->device);
