@@ -246,9 +246,8 @@ static int wait_for_nic(const char *nic_name)
 	struct uevent ue = {0};
 
 	if (! (nic_name && nic_name[0])) {
-		return -1;
+		return 0;
 	}
-
 
 	sprintf(path, "/sys/class/net/%s/ifindex", nic_name);
 
