@@ -29,3 +29,10 @@ If you want to get the boot disk file for VirtualBox, please reconfigure with fl
 
 Then you can find `hyper-vbox-bootimage.iso` in the build directory. Booting from this iso will
 bring you to the hyper world.
+
+### Building for [Intel](https://www.intel.com) [Clear Containers](https://clearlinux.org/features/intel%C2%AE-clear-containers)
+
+Clear Containers uses hyperstart in 'application mode', that is, not as the init process. To build hyperstart in this mode you need to pass some extra arguments to `autogen.sh`.
+
+    > ./autogen.sh
+    > ./configure --enable-daemon
